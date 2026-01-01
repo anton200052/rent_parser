@@ -1,0 +1,64 @@
+<th:block xmlns:th="http://www.thymeleaf.org" th:fragment="body">
+    <div class="page">
+        <div class="page-header">
+            <div class="actions">
+                <button type="button" class="btn btn-primary"
+                        hx-get="/users/new"
+                        hx-target="#main"
+                        hx-swap="innerHTML"
+                        hx-push-url="true">
+                    + New User
+                </button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="table-wrap">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th style="width:36px"></th>
+                        <th>Username</th>
+                        <th>Role</th>
+                        <th>Tasks</th>
+                        <th style="width:150px">Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="u : ${users}">
+                        <td>
+                            <span class="status-dot" th:classappend="${u.enabled} ? 'on' : 'off'"></span>
+                        </td>
+                        <td th:text="${u.username}">admin</td>
+                        <td th:text="${u.role.getName()}">admin</td>
+                        <td th:text="${u.tasks.size()}">0</td>
+                        <td class="cell-actions">
+                            <button class="btn btn-sm"
+                                    th:classappend="${u.enabled} ? ' btn-secondary' : ' btn-primary'"
+                                    th:hx-post="@{'/users/' + ${u.id} + '/toggle'}"
+                                    hx-target="#main" hx-swap="innerHTML">
+                                <span class="icon">⏻</span>
+                                <span th:text="${u.enabled} ? 'Disable' : 'Enable'">Toggle</span>
+                            </button>
+
+                            <button class="btn btn-sm btn-ghost"
+                                    th:hx-get="@{'/users/' + ${u.id} + '/edit'}"
+                                    hx-target="#main" hx-swap="innerHTML">
+                                <span class="icon">✏️</span>
+                                <span>Edit</span>
+                            </button>
+
+                            <button class="btn btn-sm btn-danger"
+                                    th:hx-post="@{'/users/' + ${u.id} + '/delete'}"
+                                    hx-target="#main" hx-swap="innerHTML">
+                                <span class="icon">🗑</span>
+                                <span>Delete</span>
+                            </button>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div> </th:block>

@@ -1,0 +1,104 @@
+<th:block xmlns:th="http://www.thymeleaf.org" th:fragment="body">
+    <div class="page">
+        <div class="page-header">
+
+            <div class="actions">
+                <button type="button" class="btn btn-primary"
+                        hx-get="/tasks/new"
+                        hx-target="#main"
+                        hx-swap="innerHTML"
+                        hx-push-url="true">
+                    + New Task
+                </button>
+            </div>
+        </div>
+
+        <div class="info-card-grid">
+            <div class="info-card">
+                <span class="info-card-icon">⏱️</span>
+                <div class="info-card-content">
+                    <div class="info-card-title">Search Interval</div>
+                    <span class="info-card-value"
+                          th:text="(${interval} ?: 0) + ' minutes'">0 minutes</span>
+                </div>
+            </div>
+
+            <div class="info-card">
+                <span class="info-card-icon">🔍</span>
+                <div class="info-card-content">
+                    <div class="info-card-title">Search Now</div>
+
+                    <div class="info-card-value">
+                        <button class="btn btn-primary btn-sm" type="button"
+                                th:hx-post="@{/tasks/searchNow}"
+                                hx-target="#main" hx-swap="innerHTML">
+                            <span class="icon" style="font-size: 12px;">▶️</span>
+                            <span>Search now</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="card">
+            <div class="table-wrap">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th style="width:36px"></th>
+                        <th>Provider</th>
+                        <th>URL</th>
+                        <th>Iterations</th>
+                        <th style="width:150px">Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:if="${#lists.isEmpty(tasks)}">
+                        <td colspan="6">
+                            <div class="empty">
+                                <div class="empty-illu">🤷</div>
+                                <div class="empty-title">No tasks yet.</div>
+                                <div class="empty-sub">Create your first task.</div>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr th:each="t : ${tasks}">
+                        <td>
+                            <span class="status-dot" th:classappend="${t.active} ? 'on' : 'off'"></span>
+                        </td>
+                        <td th:text="${t.provider.type}">IMMO_SCOUT</td>
+                        <td>
+                            <a th:href="${t.provider.providerUrl}" target="_blank" th:text="${t.provider.providerUrl}">https://...</a>
+                        </td>
+                        <td th:text="${t.iterations}">0</td>
+                        <td class="cell-actions">
+                            <button class="btn btn-sm"
+                                    th:classappend="${t.active} ? ' btn-secondary' : ' btn-primary'"
+                                    th:hx-post="@{'/tasks/' + ${t.id} + '/toggle'}"
+                                    hx-target="#main" hx-swap="innerHTML">
+                                <span class="icon">⏻</span>
+                                <span th:text="${t.active} ? 'Disable' : 'Enable'">Toggle</span>
+                            </button>
+
+                            <button class="btn btn-sm btn-ghost"
+                                    th:hx-get="@{'/tasks/' + ${t.id} + '/edit'}"
+                                    hx-target="#main" hx-swap="innerHTML">
+                                <span class="icon">✏️</span>
+                                <span>Edit</span>
+                            </button>
+
+                            <button class="btn btn-sm btn-danger"
+                                    th:hx-post="@{'/tasks/' + ${t.id} + '/delete'}"
+                                    hx-target="#main" hx-swap="innerHTML">
+                                <span class="icon">🗑</span>
+                                <span>Delete</span>
+                            </button>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</th:block>

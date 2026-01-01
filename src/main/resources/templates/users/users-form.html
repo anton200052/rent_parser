@@ -1,0 +1,105 @@
+<th:block xmlns:th="http://www.thymeleaf.org" th:fragment="body">
+    <div class="page">
+        <div class="page-header">
+            <h1>User</h1>
+            <div class="actions">
+                <button class="btn"
+                        hx-get="/users"
+                        hx-target="#main"
+                        hx-swap="innerHTML"
+                        hx-push-url="true">Cancel</button>
+
+                <button id="save-btn"
+                        class="btn btn-primary"
+                        hx-post="/users"
+                        hx-target="#main"
+                        hx-swap="innerHTML"
+                        hx-include="#task-form"
+                        hx-push-url="true">Save</button>
+            </div>
+        </div>
+
+        <form id="task-form" th:object="${user}" class="stack gap-lg" novalidate>
+            <input type="hidden" th:field="*{id}"/>
+
+            <div class="card">
+                <label class="label">Username</label>
+                <div class="inline">
+                    <input id="username" class="input" type="text" th:field="*{username}" required placeholder="Введите имя пользователя"/>
+                </div>
+                <p class="error-msg error-under" data-error-for="username"></p>
+            </div>
+
+            <div class="card">
+                <label class="label">Password</label>
+                <div class="inline">
+                    <input id="password" class="input" type="text" th:field="*{password}" required placeholder="Введите пароль"/>
+                </div>
+                <p class="error-msg error-under" data-error-for="password"></p>
+            </div>
+
+            <div class="card">
+                <label class="label">Role</label>
+                <div class="inline">
+                    <select id="role" class="input" th:field="*{role}">
+                        <option th:each="r : ${roles}"
+                                th:value="${r.id}"
+                                th:text="${r.name}">
+                        </option>
+                    </select>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        (function () {
+            const saveBtn = document.getElementById('save-btn');
+            const form = document.getElementById('task-form');
+            const requiredInputs = form.querySelectorAll('[required]');
+            let submitTried = false;
+
+            function showError(input, msg) {
+                input.classList.toggle('invalid', !!msg);
+                const error = form.querySelector(`.error-msg[data-error-for="${input.id}"]`);
+                if (error) error.textContent = msg || '';
+            }
+
+            function validateAll() {
+                let isValid = true;
+                requiredInputs.forEach(input => {
+                    const val = input.value.trim();
+                    if (!val) {
+                        isValid = false;
+                        showError(input, 'Поле обязательно.');
+                    } else {
+                        showError(input, '');
+                    }
+                });
+                return isValid;
+            }
+
+            requiredInputs.forEach(input => {
+                input.addEventListener('input', () => {
+                    if (submitTried) {
+                        const val = input.value.trim();
+                        showError(input, !val ? 'Поле обязательно.' : '');
+                    } else {
+                        showError(input, '');
+                    }
+                });
+            });
+
+            saveBtn.addEventListener('htmx:beforeRequest', (evt) => {
+                submitTried = true;
+                const ok = validateAll();
+                if (!ok) {
+                    evt.preventDefault();
+                    evt.stopPropagation();
+                    const firstInvalid = form.querySelector('.input.invalid');
+                    if (firstInvalid) firstInvalid.focus();
+                }
+            });
+        })();
+    </script>
+</th:block>

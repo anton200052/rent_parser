@@ -1,0 +1,234 @@
+<th:block xmlns:th="http://www.thymeleaf.org" th:fragment="body">
+    <div class="page">
+        <div class="page-header">
+            <h1>Task</h1>
+            <div class="actions">
+                <button class="btn"
+                        hx-get="/tasks"
+                        hx-target="#main"
+                        hx-swap="innerHTML"
+                        hx-push-url="true">Cancel</button>
+
+                <button id="save-btn"
+                        class="btn btn-primary"
+                        hx-post="/tasks"
+                        hx-target="#main"
+                        hx-swap="innerHTML"
+                        hx-include="#task-form"
+                        hx-push-url="true">Save</button>
+            </div>
+        </div>
+
+        <form id="task-form" th:object="${taskInfo}" class="stack gap-lg" novalidate>
+            <input type="hidden" th:field="*{id}"/>
+            <!-- Provider -->
+            <div class="card">
+                <div class="heading">Provider</div>
+                <div class="grid-2">
+                    <label class="label" for="providerType">Type</label>
+                    <select id="providerType" class="input" th:field="*{provider.type}">
+                        <option value="IMMO_SCOUT">Immoscout24</option>
+                    </select>
+
+                    <label class="label" for="providerUrl">Search URL</label>
+                    <input id="providerUrl" class="input" type="url"
+                           th:field="*{provider.providerUrl}"
+                           placeholder="https://www.immobilienscout24.de/..."
+                           required />
+                    <p class="error-msg error-under" data-error-for="providerUrl"></p>
+                </div>
+            </div>
+
+            <!-- Telegram Notifier -->
+            <div class="card">
+                <div class="heading">Telegram Notifier</div>
+                <div class="grid-2">
+                    <div>
+                        <label class="label" for="telegramToken">Bot Token</label>
+                        <input id="telegramToken" class="input" type="text"
+                               th:field="*{telegramNotification.token}"
+                               placeholder="123456:ABC-DEF..." required />
+                        <p class="error-msg" data-error-for="telegramToken"></p>
+                    </div>
+
+                    <div>
+                        <label class="label">Chat IDs</label>
+
+                        <div class="inline">
+                            <input id="chatIdComposer" class="input" type="text" inputmode="numeric"
+                                   placeholder="введите Chat ID и нажмите Add" />
+                            <button type="button" class="btn" id="addChatIdBtn">Add</button>
+                        </div>
+                        <p class="note">Можно добавить несколько Chat ID. Минимум — один.</p>
+                        <p class="error-msg" data-error-for="chatIds"></p>
+
+                        <div id="chatIdListWrap" class="list-wrap">
+                            <div id="chatIdList" class="chips"></div>
+                        </div>
+
+                        <div id="chatIdInputs" hidden>
+                            <input th:each="cid, iStat : *{telegramNotification.chatIds}"
+                                   type="hidden"
+                                   th:name="${'telegramNotification.chatIds[' + iStat.index + ']'}"
+                                   th:value="${cid}" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <template id="chipTemplate">
+    <span class="chip" data-row>
+      <span class="chip-text"></span>
+      <button type="button" class="chip-x" aria-label="Remove">&times;</button>
+    </span>
+    </template>
+
+    <script>
+        (function () {
+            const form = document.getElementById('task-form');
+            const saveBtn = document.getElementById('save-btn');
+            const providerUrl = document.getElementById('providerUrl');
+            const telegramToken = document.getElementById('telegramToken');
+            const composer = document.getElementById('chatIdComposer');
+            const addBtn = document.getElementById('addChatIdBtn');
+            const chips = document.getElementById('chatIdList');
+            const inputs = document.getElementById('chatIdInputs');
+            const chipTpl = document.getElementById('chipTemplate');
+
+            saveBtn.disabled = false;
+
+            let submitTried = false;
+
+            function getChatIds() {
+                return Array.from(inputs.querySelectorAll('input[name^="telegramNotification.chatIds["]'))
+                    .map(i => i.value);
+            }
+            let chatIds = getChatIds();
+
+            const err = (n) => document.querySelector(`.error-msg[data-error-for="${n}"]`);
+
+            function setErr(el, msg) {
+                if (!el) return;
+                el.classList.toggle('invalid', !!msg);
+                const e = err(el.id);
+                if (e) e.textContent = msg || '';
+            }
+            function setGroupErr(name, msg) {
+                const e = err(name);
+                if (e) e.textContent = msg || '';
+            }
+
+            function syncHidden() {
+                inputs.innerHTML = '';
+                chatIds.forEach((v, i) => {
+                    const h = document.createElement('input');
+                    h.type = 'hidden';
+                    h.name = `telegramNotification.chatIds[${i}]`;
+                    h.value = v;
+                    inputs.appendChild(h);
+                });
+            }
+
+            function renderChips() {
+                chips.innerHTML = '';
+                chatIds.forEach(v => {
+                    const c = chipTpl.content.firstElementChild.cloneNode(true);
+                    c.querySelector('.chip-text').textContent = v;
+                    chips.appendChild(c);
+                });
+            }
+
+            function addChatId(v) {
+                v = (v || '').trim();
+                if (!v) return;
+                if (chatIds.includes(v)) {
+                    if (submitTried) setGroupErr('chatIds', 'Такой Chat ID уже добавлен.');
+                    return;
+                }
+                chatIds.push(v);
+                composer.value = '';
+                if (submitTried) validateChatIds(true);
+                syncHidden();
+                renderChips();
+            }
+
+            function removeChatId(v) {
+                chatIds = chatIds.filter(x => x !== v);
+                syncHidden();
+                renderChips();
+                if (submitTried) validateChatIds(true);
+            }
+
+            function isValidHttpUrl(value) {
+                try {
+                    const u = new URL(value);
+                    return u.protocol === 'http:' || u.protocol === 'https:';
+                } catch { return false; }
+            }
+
+            function validateProvider(show) {
+                const val = (providerUrl.value || '').trim();
+                const ok = !!val && isValidHttpUrl(val);
+                if (show) {
+                    if (!val) setErr(providerUrl, 'Поле обязательно.');
+                    else if (!isValidHttpUrl(val)) setErr(providerUrl, 'Введите корректную ссылку (http/https).');
+                    else setErr(providerUrl, '');
+                }
+                return ok;
+            }
+
+            function validateToken(show) {
+                const val = (telegramToken.value || '').trim();
+                const ok = !!val;
+                if (show) setErr(telegramToken, ok ? '' : 'Поле обязательно.');
+                return ok;
+            }
+
+            function validateChatIds(show) {
+                const ok = chatIds.length > 0;
+                if (show) setGroupErr('chatIds', ok ? '' : 'Добавьте хотя бы один Chat ID.');
+                return ok;
+            }
+
+            function validateAll(show) {
+                const a = validateProvider(show);
+                const b = validateToken(show);
+                const c = validateChatIds(show);
+                return a && b && c;
+            }
+
+            addBtn.onclick = () => addChatId(composer.value);
+            composer.onkeydown = (e) => { if (e.key === 'Enter') { e.preventDefault(); addChatId(composer.value); } };
+            chips.onclick = (e) => {
+                if (e.target.classList.contains('chip-x')) {
+                    removeChatId(e.target.closest('.chip').querySelector('.chip-text').textContent);
+                }
+            };
+
+            providerUrl.addEventListener('input', () => { if (submitTried) validateProvider(true); });
+            telegramToken.addEventListener('input', () => { if (submitTried) validateToken(true); });
+
+            saveBtn.addEventListener('htmx:beforeRequest', (evt) => {
+                submitTried = true;
+                const ok = validateAll(true);
+                if (!ok) {
+                    evt.preventDefault();
+                    evt.stopPropagation();
+
+                    // Фокус на первом ошибочном поле
+                    const firstInvalid = document.querySelector('.input.invalid');
+                    if (firstInvalid && firstInvalid.focus) firstInvalid.focus();
+                    else {
+                        const chatErr = err('chatIds');
+                        if (chatErr) chatErr.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                }
+            });
+
+            renderChips();
+            syncHidden();
+        })();
+    </script>
+</th:block>

@@ -1,0 +1,628 @@
+:root {
+    --bg: #0f1318;
+    --panel: #141a21;
+    --panel-2: #1a212a;
+    --muted: #a6b0bf;
+    --text: #e5ecf5;
+    --primary: #4f7cff;
+    --primary-600: #3d63d6;
+    --accent: #23d8a1;
+    --danger: #ff6b6b;
+    --warning: #d6a23d;
+    --border: #242c37;
+    --shadow: 0 8px 24px rgba(0, 0, 0, .35);
+    --radius: 14px;
+}
+
+/* --- Base & Typography --- */
+* {
+    box-sizing: border-box;
+}
+
+html, body {
+    height: 100%;
+}
+
+body.app {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font: 14px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, 'Helvetica Neue', Arial, sans-serif;
+}
+
+.mi {
+    display: inline-block;
+}
+
+.mi-briefcase::before {
+    content: "\1F4BC";
+}
+
+.mi-cog::before {
+    content: "\2699";
+}
+
+.mi-users::before {
+    content: "👨🏻‍💻";
+}
+
+.brand-name {
+    text-align: center;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #fff; /* Или другой цвет по вашему дизайну */
+    margin-top: 10px;
+    letter-spacing: 1px;
+}
+
+/* --- Main Layout --- */
+.sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 220px;
+    background: var(--panel);
+    border-right: 1px solid var(--border);
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.content {
+    margin-left: 220px;
+    padding: 24px;
+    min-height: 100%;
+}
+
+.page {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.page-header h1 {
+    margin: 0;
+    font-size: 20px;
+}
+
+.actions {
+    display: flex;
+    gap: 8px;
+}
+
+.sidebar-footer {
+    margin-top: auto;
+    color: var(--muted);
+    font-size: 12px;
+}
+
+/* --- Sidebar Components --- */
+.brand {
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 16px;
+}
+
+.logo-placeholder {
+    width: 100%;
+    height: auto;
+    max-height: 120px;
+    border-radius: var(--radius);
+    object-fit: cover;
+    display: block;
+}
+
+.menu {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.menu-item {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    padding: 10px 12px;
+    border-radius: 10px;
+    color: var(--muted);
+    text-decoration: none;
+}
+
+.menu-item:hover {
+    background: var(--panel-2);
+    color: var(--text);
+}
+
+.menu-item.is-active {
+    background: var(--panel-2);
+    color: var(--text);
+    box-shadow: inset 0 0 0 1px var(--border);
+}
+
+.menu-item .mi {
+    width: 18px;
+}
+
+/* --- Card & Table --- */
+.card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    box-shadow: var(--shadow);
+}
+
+.info-card-grid {
+    display: flex;
+    flex-wrap: wrap; /* Позволяет карточкам переноситься на новую строку на малых экранах */
+    gap: 16px;       /* Отступ между карточками, соответствует .page */
+}
+
+/* 2. Стиль самой инфо-карточки */
+.info-card {
+    /* Используем переменные из :root для соответствия .card */
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+
+    /* Внутренний макет карточки */
+    display: flex;
+    align-items: center;
+    gap: 16px; /* Отступ между иконкой и текстовым контентом */
+
+    /* Гибкость */
+    flex: 1; /* Позволяет карточкам расти и занимать равное место */
+    min-width: 240px; /* Минимальная ширина до переноса */
+    padding: 16px 20px;
+}
+
+/* 3. Иконка в карточке (⏱️, 🔍) */
+.info-card-icon {
+    font-size: 26px; /* Немного крупнее для акцента */
+    color: var(--muted);
+    line-height: 1; /* Убирает лишнюю высоту строки */
+}
+
+/* 4. Контейнер для текста ("Заголовок" + "Значение") */
+.info-card-content {
+    display: flex;
+    flex-direction: column;
+    gap: 4px; /* Маленький отступ между заголовком и значением */
+}
+
+/* 5. Заголовок карточки (Search Interval, Search Now) */
+.info-card-title {
+    font-weight: 600;
+    color: var(--text);
+    font-size: 16px;
+    white-space: nowrap; /* Запрещаем перенос заголовка */
+}
+
+/* 6. Значение (90 min) или кнопка (Search now) */
+.info-card-value {
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1; /* Помогает выровнять текст "90 min" */
+}
+
+.table-wrap {
+    overflow: auto;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table th, .table td {
+    padding: 12px 10px;
+    text-align: left;
+    vertical-align: middle;
+    border-bottom: 0;
+}
+
+.table tbody tr {
+    position: relative;
+}
+
+.table tbody tr::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-bottom: 1px solid var(--border);
+    pointer-events: none;
+}
+
+.table tbody tr:last-child::after {
+    display: none;
+}
+
+.table thead th {
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    font-size: 12px;
+}
+
+.table-compact th, .table-compact td {
+    padding: 10px;
+}
+
+.empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 28px 0;
+    color: var(--muted);
+}
+
+.empty-illu {
+    font-size: 42px;
+}
+
+.cell-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+/* --- Forms --- */
+.label {
+    display: block;
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 8px;
+}
+
+.input, select {
+    width: 100%;
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 10px;
+    padding: 10px 12px;
+    outline: none;
+}
+
+.input:focus, select:focus {
+    border-color: var(--primary);
+}
+
+.input.invalid {
+    border-color: var(--danger) !important;
+}
+
+.error-msg {
+    color: var(--danger);
+    font-size: 12px;
+    margin-top: 6px;
+    min-height: 14px;
+}
+
+.inline {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.unit {
+    color: var(--muted);
+}
+
+/* --- Buttons --- */
+.btn {
+    appearance: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: var(--panel-2);
+    color: var(--text);
+    padding: 10px 14px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    transition: filter .15s ease, transform .02s ease;
+    text-decoration: none;
+    line-height: 1;
+}
+
+.btn:hover {
+    filter: brightness(1.08);
+}
+
+.btn:active {
+    transform: translateY(1px);
+}
+
+.btn:disabled {
+    opacity: .6;
+    cursor: not-allowed;
+}
+
+.btn-sm {
+    padding: 8px 10px;
+    border-radius: 8px;
+    font-size: 13px;
+}
+
+.btn-icon {
+    padding: 8px;
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+}
+
+.btn-primary {
+    background: var(--primary);
+    border-color: var(--primary-600);
+    color: #fff;
+}
+
+.btn-secondary {
+    background: transparent;
+}
+
+.btn-ghost {
+    background: transparent;
+    border-color: var(--border);
+}
+
+.btn-danger {
+    background: var(--danger);
+    border-color: rgba(0, 0, 0, .15);
+    color: #fff;
+}
+
+.btn-warning {
+    background: var(--warning);
+    border-color: rgba(0, 0, 0, .15);
+    color: #141414;
+}
+
+.btn .icon {
+    opacity: .9;
+    font-size: 14px;
+    line-height: 1;
+}
+
+/* --- Other Components --- */
+.status-dot {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #566;
+    box-shadow: 0 0 0 2px var(--panel);
+    border: 1px solid var(--border);
+}
+
+.status-dot.on {
+    background: var(--accent);
+}
+
+.status-dot.off {
+    background: var(--warning);
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 28px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    inset: 0;
+    background: #44515f;
+    transition: .2s;
+    border-radius: 999px;
+}
+
+.slider:before {
+    content: "";
+    position: absolute;
+    height: 22px;
+    width: 22px;
+    left: 3px;
+    top: 3px;
+    background: white;
+    border-radius: 50%;
+    transition: .2s;
+}
+
+.switch input:checked + .slider {
+    background: var(--primary);
+}
+
+.switch input:checked + .slider:before {
+    transform: translateX(22px);
+}
+
+.toast {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 14px;
+    box-shadow: var(--shadow);
+    display: none;
+}
+
+.toast.show {
+    display: block;
+}
+
+.list-wrap {
+    margin-top: 8px;
+    max-height: 180px;
+    overflow: auto;
+    border: 1px dashed var(--border);
+    border-radius: 10px;
+    padding: 8px;
+    background: var(--panel-2);
+}
+
+.chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    box-shadow: var(--shadow);
+}
+
+.chip-text {
+    font-size: 13px;
+    color: var(--text);
+}
+
+.chip-x {
+    appearance: none;
+    border: none;
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 16px;
+    line-height: 1;
+    padding: 0 2px;
+}
+
+.chip-x:hover {
+    color: var(--text);
+}
+
+/* --- Utility & Helpers --- */
+.heading {
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.muted {
+    color: var(--muted);
+}
+
+.note {
+    margin-top: 8px;
+    color: var(--muted);
+}
+
+.note.warning {
+    background: rgba(214, 162, 61, .12);
+    border: 1px solid rgba(214, 162, 61, .35);
+    padding: 8px 10px;
+    border-radius: 8px;
+}
+
+.hours {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+}
+
+.hours label {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.grid-2 {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+}
+
+.grid-2 .error-under {
+    grid-column: 2;
+}
+
+.stack {
+    display: flex;
+    flex-direction: column;
+}
+
+.gap-lg {
+    gap: 18px;
+}
+
+.gap-md {
+    gap: 12px;
+}
+
+.flex-row {
+    display: flex;
+}
+
+.align-center {
+    align-items: center;
+}
+
+/* --- Responsive --- */
+@media (min-width: 720px) {
+    .grid-2 {
+        grid-template-columns: 200px 1fr;
+    }
+}
+
+@media (max-width: 720px) {
+    .cell-actions {
+        gap: 6px;
+    }
+    .btn-sm span.label {
+        display: none;
+    }
+}
+
+@media (max-width: 980px) {
+    .sidebar {
+        width: 76px;
+        padding: 12px;
+    }
+    .menu-item span:last-child {
+        display: none;
+    }
+    .content {
+        margin-left: 76px;
+    }
+    .brand {
+        justify-content: center;
+        margin-bottom: 0;
+        padding-bottom: 8px;
+    }
+    .logo-placeholder {
+        width: 100%;
+        height: auto;
+        max-height: 50px;
+    }
+}

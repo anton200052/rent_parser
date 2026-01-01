@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin • Tasks</title>
+  <link rel="stylesheet" th:href="@{/css/styles.css}" href="/css/styles.css" />
+  <script src="https://unpkg.com/htmx.org@1.9.12" defer></script>
+  <script th:src="@{/js/app.js}" src="/js/app.js" defer></script>
+</head>
+<body class="app">
+  <aside class="sidebar">
+      <div class="brand">
+          <img th:src="@{images/macan.jpg}" alt="logo" class="logo-placeholder">
+          <div class="brand-name">Macan Rent Parser</div>
+      </div>
+
+    <nav class="menu">
+      <a class="menu-item is-active" href="#" hx-get="/tasks" hx-target="#main" hx-swap="innerHTML" hx-push-url="true" data-route="/tasks">
+        <span class="mi mi-briefcase"></span><span>Tasks</span>
+      </a>
+      <a class="menu-item" href="#" hx-get="/settings" hx-target="#main" hx-swap="innerHTML" hx-push-url="true" data-route="/settings">
+        <span class="mi mi-cog"></span><span>Settings</span>
+      </a>
+      <a class="menu-item" href="#" hx-get="/users" hx-target="#main" hx-swap="innerHTML" hx-push-url="true" data-route="/users">
+         <span class="mi mi-users"></span><span>Users</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer"><span class="version" th:text="${appVersion}">v0.1</span></div>
+  </aside>
+
+  <main id="main" class="content" th:insert="~{tasks/list :: body}"></main>
+  <div id="toast" class="toast" role="status" aria-live="polite" aria-atomic="true"></div>
+</body>
+
+<script>
+    document.addEventListener('showToast', (e) => {
+        const message = e.detail.message || 'Settings saved!';
+
+        const el = document.getElementById('toast');
+        if (el) {
+            el.textContent = message;
+            el.classList.add('show');
+            setTimeout(() => {
+                el.classList.remove('show');
+            }, 2500);
+        }
+    });
+
+    document.addEventListener('htmx:afterSwap', (e) => {
+        const path = e.detail.pathInfo.requestPath;
+        const menuLinks = document.querySelectorAll('.menu-item[data-route]');
+
+        menuLinks.forEach(link => {
+            link.classList.remove('is-active');
+            if (link.dataset.route === path) {
+                link.classList.add('is-active');
+            }
+        });
+    });
+
+    document.body.addEventListener('htmx:responseError', function(evt) {
+        if (evt.detail.xhr.status === 403) {
+            const e = new CustomEvent('showToast', { detail: { message: 'Нет доступа' } });
+            document.dispatchEvent(e);
+        }
+    });
+</script>
+</html>

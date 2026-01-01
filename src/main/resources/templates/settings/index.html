@@ -1,0 +1,43 @@
+<!-- Settings fragment -->
+<th:block xmlns:th="http://www.thymeleaf.org" th:fragment="body">
+    <div class="page">
+        <div class="page-header">
+            <h1>Settings</h1>
+            <div class="actions">
+                <button class="btn btn-primary"
+                        hx-post="/settings"
+                        hx-include="#settings-form"
+                        hx-swap="none"
+                        th:text="Save">
+                </button>
+            </div>
+        </div>
+
+        <form id="settings-form" th:object="${settings}" class="stack gap-lg">
+            <input type="hidden" th:field="*{id}"/>
+            <div class="card">
+                <label class="label">Interval</label>
+                <div class="inline">
+                    <input class="input" type="number" min="5" step="5" name="intervalMinutes"
+                           th:field="*{intervalMinutes}" placeholder="90"/>
+                    <span class="unit">minutes</span>
+                </div>
+                <div class="note">Do <b>not</b> go under 5 minutes to avoid being detected as a bot.</div>
+            </div>
+
+            <div class="card">
+                <div class="heading">Working hours</div>
+                <div class="muted">During these hours, the app will search for new apartments. If nothing is configured,
+                    it will search around the clock.
+                </div>
+                <div class="hours">
+                    <label><span>From</span><input class="input" type="time" name="workFrom" th:field="*{workFrom}"
+                                                   value="08:30"/></label>
+                    <label><span>Until</span><input class="input" type="time" name="workUntil" th:field="*{workUntil}"
+                                                    value="22:00"/></label>
+                </div>
+            </div>
+        </form>
+    </div>
+
+</th:block>
