@@ -3,7 +3,6 @@
 ![Java](https://img.shields.io/badge/Java-Spring_Boot-orange)
 ![Architecture](https://img.shields.io/badge/Architecture-Multi--Tenant-blue)
 ![Strategy](https://img.shields.io/badge/Strategy-Reverse_Engineering-red)
-![Frontend](https://img.shields.io/badge/UI-Thymeleaf%2FReact-green)
 
 **RentParser** is a high-performance, multi-user web application designed to monitor and parse real estate listings in Germany. Built with **Spring Boot**, it moves beyond traditional web scraping by leveraging reverse-engineered internal APIs to ensure speed, stability, and low detection rates.
 
